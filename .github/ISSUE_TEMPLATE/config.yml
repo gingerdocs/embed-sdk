@@ -4,7 +4,7 @@ contact_links:
     url: https://github.com/gingerdocs/embed-sdk/blob/main/SECURITY.md
     about: Please email security@gingerdocs.com rather than opening a public issue.
   - name: API reference
-    url: https://docs.gingerdocs.com
+    url: https://app.gingerdocs.com/docs
     about: Endpoints, error codes and webhooks.
   - name: Account, billing or plan questions
     url: mailto:support@gingerdocs.com

@@ -1,0 +1,44 @@
+name: Release
+
+# Manual, not on tag push. Publishing is irreversible after 72 hours and the
+# order across the two repos matters (core before react, or the first React
+# installer gets an unresolvable peer), so it should be a decision rather than
+# a side effect. The same file serves both repos: each publishes the one
+# package at its root.
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Dry run only (recommended first)
+        required: true
+        type: boolean
+        default: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write        # npm provenance
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      - name: Install
+        run: npm ci || npm install
+
+      - name: Build and test
+        run: npm run build && npm test
+
+      - name: Publish
+        # `--provenance` links the tarball to this workflow run, so anyone can
+        # verify what source produced it. Free, and worth it for a package that
+        # ends up in other companies' production pages.
+        run: npm publish --provenance --access public ${{ inputs.dry_run && '--dry-run' || '' }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

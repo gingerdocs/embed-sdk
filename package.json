@@ -1,0 +1,56 @@
+{
+  "name": "@gingerdocs/embed",
+  "version": "0.1.0",
+  "description": "Embed the GingerDocs signing experience in your own page.",
+  "license": "MIT",
+  "author": "GingerDocs",
+  "homepage": "https://github.com/gingerdocs/embed-sdk#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gingerdocs/embed-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/gingerdocs/embed-sdk/issues"
+  },
+  "keywords": [
+    "gingerdocs",
+    "esignature",
+    "e-signature",
+    "embed",
+    "iframe",
+    "signing",
+    "pdf",
+    "sdk"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/gingerdocs-embed.umd.cjs",
+  "module": "./dist/gingerdocs-embed.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/gingerdocs-embed.js",
+      "require": "./dist/gingerdocs-embed.umd.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && vite build",
+    "test": "vitest run",
+    "size": "node scripts/check-size.mjs"
+  },
+  "devDependencies": {
+    "jsdom": "^29.1.1",
+    "typescript": "~6.0.2",
+    "vite": "^8.0.12",
+    "vitest": "^4.1.7"
+  }
+}

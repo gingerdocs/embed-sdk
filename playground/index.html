@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GingerDocs embed playground</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Embed playground</h1>
+    <p class="sub">A sandbox for <code>@gingerdocs/embed</code>. Your secret key stays on the little
+      Node server; this page only ever sees a session URL — same as a real integration.</p>
+  </div>
+  <div id="status" class="status"></div>
+</header>
+
+<main>
+  <!-- ── Controls ─────────────────────────────────────────────────────── -->
+  <section class="panel">
+    <h2>1 · Mint a session</h2>
+
+    <label>
+      <span>Kind</span>
+      <select id="kind">
+        <option value="signing">signing — one recipient signs one document</option>
+        <option value="workspace" selected>workspace — your user works inside your app</option>
+      </select>
+    </label>
+
+    <div id="signing-fields" hidden>
+      <label>
+        <span>Document ID</span>
+        <input id="document_id" placeholder="uuid of a SENT document">
+        <small>The recipient is derived from it — there is only ever one.</small>
+      </label>
+    </div>
+
+    <div id="workspace-fields">
+      <label>
+        <span>Mode</span>
+        <select id="mode">
+          <option value="read_only">read_only — look, don't touch</option>
+          <option value="minimal" selected>minimal — create from a template and send</option>
+          <option value="advanced">advanced — upload, place fields, save a template</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Identify the user by</span>
+        <select id="user_ref">
+          <option value="external_user_id" selected>external_user_id — your own id for them</option>
+          <option value="user_id">user_id — the uuid we returned</option>
+        </select>
+        <small>Exactly one of the two. The mint refuses both together rather than picking a winner.</small>
+      </label>
+
+      <label>
+        <span>User</span>
+        <input id="user_value" placeholder="your-app-user-42">
+        <small>Who the session acts as. Create them first with <code>POST /v1/users</code>.</small>
+      </label>
+
+      <!-- ── preselect ────────────────────────────────────────────────── -->
+      <div class="group">
+        <p class="group-head">preselect <small>what the frame opens on</small></p>
+
+        <label>
+          <span>Kind</span>
+          <select id="preselect_type">
+            <option value="">(none)</option>
+            <option value="document_id">document_id</option>
+            <option value="template_id">template_id</option>
+          </select>
+          <small id="preselect-note">Optional — except on <code>read_only</code>, where a viewer with
+            nothing to view is an empty frame. A template may also be one your company shared.</small>
+        </label>
+
+        <label id="preselect-id-row" hidden>
+          <span>Id</span>
+          <input id="preselect_id" placeholder="uuid">
+        </label>
+      </div>
+
+      <label class="check">
+        <input type="checkbox" id="allow_download">
+        <span>allow_download <small>— only takes effect once the document is COMPLETED</small></span>
+      </label>
+
+      <!-- ── the two party presets ────────────────────────────────────── -->
+      <div class="group">
+        <p class="group-head">The two parties <small>pre-fill the embed's own form</small></p>
+
+        <p class="note">Both are optional. <code>locked</code> renders those fields read-only in the
+          frame <em>and</em> is enforced on the write — a differing value is refused
+          <code>422 EMBED_PRESET_LOCKED</code>, per attribute. A key you leave empty is never locked.</p>
+        <p class="note" id="party-note"></p>
+
+        <label>
+          <span>sender.name</span>
+          <input id="sender_name" placeholder="Acme Billing">
+          <small>Who the document is <em>from</em>. Empty = the workspace user above, which is what
+            every API document has always been from.</small>
+        </label>
+
+        <label>
+          <span>sender.email <em>— optional</em></span>
+          <input id="sender_email" placeholder="billing@acme.test">
+          <small>Identifies the party; nothing is delivered to it. Optional, matching
+            <code>POST /v1/users</code>.</small>
+        </label>
+
+        <label class="check">
+          <input type="checkbox" id="sender_locked">
+          <span>sender.locked</span>
+        </label>
+
+        <label>
+          <span>recipient.name</span>
+          <input id="recipient_name" placeholder="Ada Lovelace">
+          <small>Who signs it. Still required in the body either way — a preset pre-fills the form,
+            it is not a value the server falls back to.</small>
+        </label>
+
+        <label>
+          <span>recipient.email</span>
+          <input id="recipient_email" placeholder="ada@client.test">
+        </label>
+
+        <label>
+          <span>recipient.locale</span>
+          <select id="recipient_locale">
+            <option value="">(not stated — they read it in the sender's language)</option>
+            <option value="en">English</option>
+            <option value="ja">日本語</option>
+            <option value="ko">한국어</option>
+            <option value="de">Deutsch</option>
+            <option value="es">Español</option>
+            <option value="fr">Français</option>
+          </select>
+          <small>The <em>signer's</em> language — their email, signing page and typed-signature font.
+            Not the frame's; that is <code>locale</code> below.</small>
+        </label>
+
+        <label class="check">
+          <input type="checkbox" id="recipient_locked">
+          <span>recipient.locked</span>
+        </label>
+      </div>
+    </div>
+
+    <label>
+      <span>Locale</span>
+      <select id="locale">
+        <option value="">(session default)</option>
+        <option value="en">English</option>
+        <option value="ja">日本語</option>
+        <option value="ko">한국어</option>
+        <option value="de">Deutsch</option>
+        <option value="es">Español</option>
+        <option value="fr">Français</option>
+      </select>
+      <small>The language the <em>frame</em> opens in — the person at the keyboard. Absent means the
+        workspace user's own.</small>
+    </label>
+
+    <label>
+      <span>Expand</span>
+      <select id="expand">
+        <option value="modal" selected>modal — the SDK pins this iframe over the page</option>
+        <option value="none">none — opt out; the frame hides the control</option>
+      </select>
+      <small>A <em>mount</em> option, not a mint one. Takes effect on the next mount.</small>
+    </label>
+
+    <label>
+      <span>Frame width</span>
+      <select id="frame-width">
+        <option value="">full — whatever this column is</option>
+        <option value="400px">400px — a sidebar embed</option>
+        <option value="320px">320px — a phone</option>
+      </select>
+      <small>Narrow frames get the app's mobile layout, and are where Expand earns its keep.</small>
+    </label>
+
+    <div class="row">
+      <button id="mint" class="primary">Mint &amp; mount</button>
+      <button id="unmount">Unmount</button>
+      <button id="reload">Reload with a fresh session</button>
+    </div>
+
+    <p id="error" class="error" hidden></p>
+
+    <details id="session-details" hidden>
+      <summary>Mint response</summary>
+      <pre id="session-json"></pre>
+    </details>
+  </section>
+
+  <!-- ── The frame ────────────────────────────────────────────────────── -->
+  <section class="panel frame-panel">
+    <h2>2 · The embed</h2>
+    <div id="embed" class="embed-host">
+      <p class="placeholder">Mint a session to mount it here.</p>
+    </div>
+  </section>
+
+  <!-- ── Events ───────────────────────────────────────────────────────── -->
+  <section class="panel">
+    <div class="events-head">
+      <h2>3 · Events</h2>
+      <button id="clear-events" class="ghost">Clear</button>
+    </div>
+    <p class="sub small">Every event the SDK hands your code. These are
+      <strong>convenience, not truth</strong> — they come from a browser. Anything that matters
+      should come from the webhook or <code>GET /v1/documents/{id}</code>. The exceptions are
+      <code>expanded</code> / <code>collapsed</code>: the SDK acts on those before it forwards
+      them, so watch the frame jump to full screen as they land.</p>
+    <ol id="events" class="events"></ol>
+  </section>
+
+  <!-- ── The code ─────────────────────────────────────────────────────── -->
+  <section class="panel">
+    <h2>4 · What you'd write</h2>
+    <p class="sub small">Updates with your choices above. The server half is the only place a secret
+      key appears.</p>
+    <pre id="snippet" class="snippet"></pre>
+  </section>
+</main>
+
+<script type="module" src="/app.js"></script>
+</body>
+</html>

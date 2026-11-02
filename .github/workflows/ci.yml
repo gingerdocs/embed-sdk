@@ -1,0 +1,44 @@
+name: CI
+
+# One file for both SDK repos. Each repo is a plain npm package at its root,
+# so nothing here names a package: the only difference between the two is the
+# size budget, and that keys off the script's presence rather than a name.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # `npm ci` when there is a lockfile, `npm install` when there is not.
+      # Both packages ship one today; this keeps a fresh package buildable.
+      - name: Install
+        run: npm ci || npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm test
+
+      # The budget is the point of the core package: it loads on other
+      # people's pages. Failing the build is the only thing that keeps it
+      # honest. The React repo has no such script and skips this.
+      - name: Size budget
+        if: hashFiles('scripts/check-size.mjs') != ''
+        run: npm run size
+
+      # The last line of defence before a publish. If a source file or a
+      # dotfile appears in this list, the `files` allowlist has drifted.
+      - name: What would be published
+        run: npm publish --dry-run

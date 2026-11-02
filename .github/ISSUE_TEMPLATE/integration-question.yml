@@ -1,0 +1,33 @@
+name: Integration question
+description: Something about integrating is unclear or harder than it should be.
+labels: ["question", "docs"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Questions are welcome. If the documentation should have answered this and did not, that is a
+        docs bug and we would rather fix it than answer it twice.
+
+  - type: textarea
+    id: goal
+    attributes:
+      label: What are you trying to do?
+      description: The product outcome, not the API call — it often has a shorter route.
+    validations:
+      required: true
+
+  - type: textarea
+    id: tried
+    attributes:
+      label: What have you tried?
+      description: Please redact keys and session URLs.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_docs
+    attributes:
+      label: Where did you look first?
+      description: |
+        Genuinely useful — if three people look in the same wrong place, the docs are wrong, not the
+        three people.

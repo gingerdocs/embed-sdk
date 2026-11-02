@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/gingerdocs/embed-sdk/blob/main/SECURITY.md
+    about: Please email security@gingerdocs.com rather than opening a public issue.
+  - name: API reference
+    url: https://docs.gingerdocs.com
+    about: Endpoints, error codes and webhooks.
+  - name: Account, billing or plan questions
+    url: mailto:support@gingerdocs.com
+    about: Not an SDK issue — email support and we will get to it faster.

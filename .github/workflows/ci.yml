@@ -15,13 +15,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # No `cache: npm`: setup-node refuses to cache when there is no lockfile,
+      # and the React repo has none until the core it depends on is published.
+      # An install of one or two dev dependencies is not worth the failure.
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
 
-      # `npm ci` when there is a lockfile, `npm install` when there is not.
-      # Both packages ship one today; this keeps a fresh package buildable.
+      # `npm ci` when there is a lockfile, `npm install` when there is not —
+      # the React repo gains its lockfile with its first install against the
+      # published core.
       - name: Install
         run: npm ci || npm install
 

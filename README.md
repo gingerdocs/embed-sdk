@@ -1,5 +1,7 @@
 # @gingerdocs/embed
 
+[![npm](https://img.shields.io/npm/v/%40gingerdocs%2Fembed?label=npm)](https://www.npmjs.com/package/@gingerdocs/embed) [![CI](https://github.com/gingerdocs/embed-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/gingerdocs/embed-sdk/actions/workflows/ci.yml) [![licence](https://img.shields.io/npm/l/%40gingerdocs%2Fembed)](https://github.com/gingerdocs/embed-sdk/blob/main/LICENSE)
+
 Put the GingerDocs signing experience inside your own page.
 
 Framework-free, under 1.5 KB gzipped, no dependencies. A React wrapper lives in
